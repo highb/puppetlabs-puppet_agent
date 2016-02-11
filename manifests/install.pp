@@ -7,9 +7,12 @@
 # [package_file_name]
 #   The puppet-agent package file name.
 #   (see puppet_agent::prepare::package_file_name)
+# [version]
+#   The puppet-agent version to install.
 #
 class puppet_agent::install(
   $package_file_name = undef,
+  $package_version = 'present'
 ) {
   assert_private()
 
@@ -63,7 +66,7 @@ class puppet_agent::install(
     }
   } else {
     package { $::puppet_agent::package_name:
-      ensure => present,
+      ensure => $package_version,
       *      => $_package_options,
     }
   }

@@ -134,15 +134,15 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
           }) }
 
           {
-            'name'        => 'pc1_repo',
+            'name'        => 'pc_repo',
             'enabled'      => '1',
             'autorefresh' => '0',
             'baseurl'     => "https://master.example.vm:8140/packages/4.0.0/sles-#{os_version}-x86_64?ssl_verify=no",
             'type'        => 'rpm-md',
           }.each do |setting, value|
-              it { is_expected.to contain_ini_setting("zypper pc1_repo #{setting}").with({
-                'path'    => '/etc/zypp/repos.d/pc1_repo.repo',
-                'section' => 'pc1_repo',
+              it { is_expected.to contain_ini_setting("zypper pc_repo #{setting}").with({
+                'path'    => '/etc/zypp/repos.d/pc_repo.repo',
+                'section' => 'pc_repo',
                 'setting' => setting,
                 'value'   => value,
               }) }

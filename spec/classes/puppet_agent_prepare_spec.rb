@@ -6,6 +6,9 @@ MCO_PLUGIN_YAML = '/etc/puppetlabs/mcollective/facts.yaml'
 MCO_LOGFILE = '/var/log/puppetlabs/mcollective.log'
 
 describe 'puppet_agent::prepare' do
+  let(:params) { {
+    :package_version => '4.0.0',
+  } }
   context 'supported operating system families' do
     ['Debian', 'RedHat'].each do |osfamily|
       facts = {
