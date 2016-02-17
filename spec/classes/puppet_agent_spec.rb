@@ -37,11 +37,12 @@ describe 'puppet_agent' do
 
             it { is_expected.to contain_class('puppet_agent') }
             it { is_expected.to contain_class('puppet_agent::params') }
-            if Puppet.version < "4.0.0"
-              it { is_expected.to contain_class('puppet_agent::prepare') }
-              it { is_expected.to contain_class('puppet_agent::install').that_comes_before('puppet_agent::service') }
-              it { is_expected.to contain_class('puppet_agent::service') }
+            it { is_expected.to contain_class('puppet_agent::prepare') }
+            it { is_expected.to contain_class('puppet_agent::install').that_comes_before('puppet_agent::service') }
+            it { is_expected.to contain_package('puppet-agent').with_ensure('present') }
 
+            if Puppet.version < "4.0.0"
+              it { is_expected.to contain_class('puppet_agent::service') }
               if params[:service_names].nil?
                 it { is_expected.to contain_service('puppet') }
                 it { is_expected.to contain_service('mcollective') }
