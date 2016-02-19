@@ -44,9 +44,6 @@ class puppet_agent (
   if versioncmp("${::clientversion}", '3.8.0') < 0 {
     fail('upgrading requires at least Puppet 3.8')
   }
-  elsif !$is_pe and versioncmp("${::clientversion}", '4.0.0') >= 0 {
-    info('puppet_agent only performs actions on Puppet 4+ when Puppet Enterprise is installed')
-  }
   elsif $is_pe and $::aio_agent_version != undef and $_package_version != undef and versioncmp("${::aio_agent_version}", "${_package_version}") >= 0 {
     info("puppet_agent is up to date at package version ${::aio_agent_version}")
   } else {
