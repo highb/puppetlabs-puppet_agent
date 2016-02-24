@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >= "4.0.0" do
+describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   [['Fedora', 'fedora/f$releasever'], ['CentOS', 'el/$releasever'], ['Amazon', 'el/6']].each do |os, urlbit|
     context "with #{os} and #{urlbit}" do
       let(:facts) {{
