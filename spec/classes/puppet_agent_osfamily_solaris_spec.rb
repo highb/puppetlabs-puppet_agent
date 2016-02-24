@@ -79,6 +79,8 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         is_expected.to contain_exec('unzip puppet-agent-1.2.5-1.i386.pkg.gz').with_creates('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.i386.pkg')
       end
 
+      it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
+
       if Puppet.version < "4.0.0"
         it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
         it { is_expected.to contain_service('pe-mcollective').with_ensure('stopped') }
@@ -136,6 +138,8 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         is_expected.to contain_exec('unzip puppet-agent-1.2.5-1.sparc.pkg.gz').with_creates('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sparc.pkg')
       end
 
+      it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
+
       if Puppet.version < "4.0.0"
         it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
         it { is_expected.to contain_service('pe-mcollective').with_ensure('stopped') }
@@ -166,7 +170,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
           is_expected.to contain_package('puppet-agent').with_adminfile('/opt/puppetlabs/packages/solaris-noask')
           is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sparc.pkg')
         end
-        end
+      end
     end
   end
 end
