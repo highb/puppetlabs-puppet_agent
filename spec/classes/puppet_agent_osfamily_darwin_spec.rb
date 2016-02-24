@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >= "4.0.0" do
+describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   before(:each) do
     # Need to mock the PE functions
     Puppet::Parser::Functions.newfunction(:pe_build_version, :type => :rvalue) do |args|
@@ -9,6 +9,14 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
 
     Puppet::Parser::Functions.newfunction(:pe_compiling_server_aio_build, :type => :rvalue) do |args|
       '1.2.5'
+    end
+  end
+
+  if Puppet.version >= "4.0.0"
+    let(:params) do
+      {
+        :package_version => '1.2.5'
+      }
     end
   end
 
@@ -48,6 +56,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
       it { should compile.with_all_deps }
       it { is_expected.to contain_file('/opt/puppetlabs') }
       it { is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.9.dmg') }
+      it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
     end
 
     context "when OSX 10.10" do
@@ -62,6 +71,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
       it { should compile.with_all_deps }
       it { is_expected.to contain_file('/opt/puppetlabs') }
       it { is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.10.dmg') }
+      it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
     end
 
     context "when OSX 10.11" do
@@ -76,6 +86,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
       it { should compile.with_all_deps }
       it { is_expected.to contain_file('/opt/puppetlabs') }
       it { is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.11.dmg') }
+      it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
     end
   end
 end
