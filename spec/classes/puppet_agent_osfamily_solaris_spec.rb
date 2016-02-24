@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >= "4.0.0" do
+describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   before(:each) do
     # Need to mock the PE functions
     Puppet::Parser::Functions.newfunction(:pe_build_version, :type => :rvalue) do |args|
@@ -9,6 +9,14 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
 
     Puppet::Parser::Functions.newfunction(:pe_compiling_server_aio_build, :type => :rvalue) do |args|
       '1.2.5'
+    end
+  end
+
+  if Puppet.version >= "4.0.0"
+    let(:params) do
+      {
+        :package_version => '1.2.5'
+      }
     end
   end
 
@@ -56,8 +64,8 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
           :operatingsystemmajrelease => '10',
         })
       end
-
       it { should compile.with_all_deps }
+
       it { is_expected.to contain_file('/opt/puppetlabs') }
       it { is_expected.to contain_file('/opt/puppetlabs/packages') }
       it do
@@ -71,28 +79,30 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
         is_expected.to contain_exec('unzip puppet-agent-1.2.5-1.i386.pkg.gz').with_creates('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.i386.pkg')
       end
 
-      it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
-      it { is_expected.to contain_service('pe-mcollective').with_ensure('stopped') }
+      if Puppet.version < "4.0.0"
+        it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
+        it { is_expected.to contain_service('pe-mcollective').with_ensure('stopped') }
 
-      [
-        'PUPpuppet',
-        'PUPaugeas',
-        'PUPdeep-merge',
-        'PUPfacter',
-        'PUPhiera',
-        'PUPlibyaml',
-        'PUPmcollective',
-        'PUPopenssl',
-        'PUPpuppet-enterprise-release',
-        'PUPruby',
-        'PUPruby-augeas',
-        'PUPruby-rgen',
-        'PUPruby-shadow',
-        'PUPstomp',
-      ].each do |package|
-        it do
-          is_expected.to contain_package(package).with_ensure('absent')
-          is_expected.to contain_package(package).with_adminfile('/opt/puppetlabs/packages/solaris-noask')
+        [
+          'PUPpuppet',
+          'PUPaugeas',
+          'PUPdeep-merge',
+          'PUPfacter',
+          'PUPhiera',
+          'PUPlibyaml',
+          'PUPmcollective',
+          'PUPopenssl',
+          'PUPpuppet-enterprise-release',
+          'PUPruby',
+          'PUPruby-augeas',
+          'PUPruby-rgen',
+          'PUPruby-shadow',
+          'PUPstomp',
+        ].each do |package|
+          it do
+            is_expected.to contain_package(package).with_ensure('absent')
+            is_expected.to contain_package(package).with_adminfile('/opt/puppetlabs/packages/solaris-noask')
+          end
         end
       end
 
@@ -113,6 +123,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
       end
 
       it { should compile.with_all_deps }
+
       it { is_expected.to contain_file('/opt/puppetlabs/packages') }
       it do
         is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sparc.pkg.gz').with_ensure('present')
@@ -125,35 +136,37 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >
         is_expected.to contain_exec('unzip puppet-agent-1.2.5-1.sparc.pkg.gz').with_creates('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sparc.pkg')
       end
 
-      it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
-      it { is_expected.to contain_service('pe-mcollective').with_ensure('stopped') }
+      if Puppet.version < "4.0.0"
+        it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
+        it { is_expected.to contain_service('pe-mcollective').with_ensure('stopped') }
 
-      [
-        'PUPpuppet',
-        'PUPaugeas',
-        'PUPdeep-merge',
-        'PUPfacter',
-        'PUPhiera',
-        'PUPlibyaml',
-        'PUPmcollective',
-        'PUPopenssl',
-        'PUPpuppet-enterprise-release',
-        'PUPruby',
-        'PUPruby-augeas',
-        'PUPruby-rgen',
-        'PUPruby-shadow',
-        'PUPstomp',
-      ].each do |package|
-        it do
-          is_expected.to contain_package(package).with_ensure('absent')
-          is_expected.to contain_package(package).with_adminfile('/opt/puppetlabs/packages/solaris-noask')
+        [
+          'PUPpuppet',
+          'PUPaugeas',
+          'PUPdeep-merge',
+          'PUPfacter',
+          'PUPhiera',
+          'PUPlibyaml',
+          'PUPmcollective',
+          'PUPopenssl',
+          'PUPpuppet-enterprise-release',
+          'PUPruby',
+          'PUPruby-augeas',
+          'PUPruby-rgen',
+          'PUPruby-shadow',
+          'PUPstomp',
+        ].each do |package|
+          it do
+            is_expected.to contain_package(package).with_ensure('absent')
+            is_expected.to contain_package(package).with_adminfile('/opt/puppetlabs/packages/solaris-noask')
+          end
         end
-      end
 
-      it do
-        is_expected.to contain_package('puppet-agent').with_adminfile('/opt/puppetlabs/packages/solaris-noask')
-        is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sparc.pkg')
-      end
+        it do
+          is_expected.to contain_package('puppet-agent').with_adminfile('/opt/puppetlabs/packages/solaris-noask')
+          is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sparc.pkg')
+        end
+        end
     end
   end
 end

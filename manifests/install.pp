@@ -64,6 +64,13 @@ class puppet_agent::install(
         source            => $::puppet_agent::source,
       }
     }
+  } elsif $::osfamily == 'Solaris' and $::operatingsystemmajrelease == '10' {
+    # Solaris 10 package provider does not provide 'versionable'
+    # Package is removed above, then re-added as the new version here.
+    package { $::puppet_agent::package_name:
+      ensure => 'present',
+      *      => $_package_options,
+    }
   } else {
     package { $::puppet_agent::package_name:
       ensure => $package_version,
