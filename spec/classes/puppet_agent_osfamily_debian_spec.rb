@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" || Puppet.version >= "4.0.0" do
+describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   facts = {
     :lsbdistid => 'Debian',
     :osfamily => 'Debian',
