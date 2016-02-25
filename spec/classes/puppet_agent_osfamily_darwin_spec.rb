@@ -55,6 +55,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
 
       it { should compile.with_all_deps }
       it { is_expected.to contain_file('/opt/puppetlabs') }
+      it { is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.9.dmg') }
       it { is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.9.dmg') }
       it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
     end
@@ -70,6 +71,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
 
       it { should compile.with_all_deps }
       it { is_expected.to contain_file('/opt/puppetlabs') }
+      it { is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.10.dmg') }
       it { is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.10.dmg') }
       it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
     end
@@ -85,6 +87,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
 
       it { should compile.with_all_deps }
       it { is_expected.to contain_file('/opt/puppetlabs') }
+      it { is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.11.dmg') }
       it { is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.osx10.11.dmg') }
       it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
     end
