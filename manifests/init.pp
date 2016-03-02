@@ -43,9 +43,6 @@ class puppet_agent (
 
   if versioncmp("${::clientversion}", '3.8.0') < 0 {
     fail('upgrading requires at least Puppet 3.8')
-  }
-  elsif $is_pe and $::aio_agent_version != undef and $_package_version != undef and versioncmp("${::aio_agent_version}", "${_package_version}") >= 0 {
-    info("puppet_agent is up to date at package version ${::aio_agent_version}")
   } else {
     if $package_version != undef and $package_version !~ /^\d+\.\d+\.\d+[.-]?\d*$/ {
       fail("invalid version ${package_version} requested")
