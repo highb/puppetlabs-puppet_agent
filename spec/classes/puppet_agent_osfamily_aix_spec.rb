@@ -13,11 +13,14 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   end
 
   if Puppet.version >= "4.0.0"
+    package_ensure = '1.2.5'
     let(:params) do
       {
-        :package_version => '1.2.5'
+        :package_version => package_ensure
       }
     end
+  else
+    package_ensure = 'present'
   end
 
   facts = {
@@ -57,7 +60,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       it {
         is_expected.to contain_package('puppet-agent').with({
             'source'    => "/opt/puppetlabs/packages/#{rpmname}",
-            'ensure'    => '1.2.5',
+            'ensure'    => package_ensure,
             'provider'  => 'rpm'
           })
       }
