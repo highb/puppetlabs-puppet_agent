@@ -47,10 +47,17 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         it { is_expected.to contain_file('/etc/puppetlabs/puppet') }
         it { is_expected.to contain_file('/etc/puppetlabs/puppet/puppet.conf') }
       end
+      
+      it do
+        is_expected.to contain_exec('replace puppet.conf removed by package removal').with_command('cp /etc/puppetlabs/puppet/puppet.conf.rpmsave /etc/puppetlabs/puppet/puppet.conf')
+        is_expected.to contain_exec('replace puppet.conf removed by package removal').with_creates('/etc/puppetlabs/puppet/puppet.conf')
+      end
 
       it { is_expected.to contain_file('/opt/puppetlabs') }
       it { is_expected.to contain_file('/opt/puppetlabs/packages') }
       it { is_expected.to contain_file("/opt/puppetlabs/packages/#{rpmname}")}
+
+      it { is_expected.to contain_class("puppet_agent::osfamily::aix") }
 
       it { is_expected.to contain_class('Puppet_agent::Install').with({
            'package_file_name'     => rpmname,

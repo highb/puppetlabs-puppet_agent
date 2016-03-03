@@ -14,6 +14,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   let(:facts) { facts }
 
   it { is_expected.to contain_class('apt') }
+  it { is_expected.to contain_notify('pc_repo_force') }
 
   context 'when PE' do
     before(:each) do
@@ -66,6 +67,8 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       },
     }) }
 
+    it { is_expected.to contain_class("puppet_agent::osfamily::debian") }
+
   end
 
   context 'when FOSS' do
@@ -80,5 +83,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         'server' => 'pgp.mit.edu',
       },
     }) }
+
+    it { is_expected.to contain_class("puppet_agent::osfamily::debian") }
   end
 end

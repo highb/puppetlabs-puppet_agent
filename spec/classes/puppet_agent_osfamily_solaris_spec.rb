@@ -80,6 +80,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       end
 
       it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
+      it { is_expected.to contain_class("puppet_agent::osfamily::solaris") }
 
       if Puppet.version < "4.0.0"
         it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }
@@ -139,6 +140,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       end
 
       it { is_expected.to contain_class('puppet_agent::install::remove_packages') }
+      it { is_expected.to contain_class("puppet_agent::osfamily::solaris") }
 
       if Puppet.version < "4.0.0"
         it { is_expected.to contain_service('pe-puppet').with_ensure('stopped') }

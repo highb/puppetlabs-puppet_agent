@@ -47,11 +47,14 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
 
   describe 'supported environment' do
     if Puppet.version >= "4.0.0"
+      package_ensure = '1.2.5'
       let(:params) do
         {
-          :package_version => '1.2.5-1'
+          :package_version => package_ensure
         }
       end
+    else
+      package_ensure = 'present'
     end
 
     context "when operatingsystemmajrelease 10 is supported" do
@@ -65,13 +68,21 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
 
       it { is_expected.to contain_class("puppet_agent::prepare::package") }
 
+      it do
+        is_expected.to contain_exec('replace puppet.conf removed by package removal').with_command('cp /etc/puppetlabs/puppet/puppet.conf.rpmsave /etc/puppetlabs/puppet/puppet.conf')
+        is_expected.to contain_exec('replace puppet.conf removed by package removal').with_creates('/etc/puppetlabs/puppet/puppet.conf')
+      end
+
+      it { is_expected.to contain_file('/opt/puppetlabs') }
+      it { is_expected.to contain_file('/opt/puppetlabs/packages') }
+      it do
+        is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm').with_ensure('present')
+        is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm').with_source('puppet:///pe_packages/4.0.0/sles-10-x86_64/puppet-agent-1.2.5-1.sles10.x86_64.rpm')
+      end
+
+      it { is_expected.to contain_class("puppet_agent::osfamily::suse") }
+
       if Puppet.version < "4.0.0"
-        it { is_expected.to contain_file('/opt/puppetlabs') }
-        it { is_expected.to contain_file('/opt/puppetlabs/packages') }
-        it do
-          is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm').with_ensure('present')
-          is_expected.to contain_file('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm').with_source('puppet:///pe_packages/4.0.0/sles-10-x86_64/puppet-agent-1.2.5-1.sles10.x86_64.rpm')
-        end
 
         [
           'pe-augeas',
@@ -101,12 +112,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         end
 
         it do
-          is_expected.to contain_exec('replace puppet.conf removed by package removal').with_command('cp /etc/puppetlabs/puppet/puppet.conf.rpmsave /etc/puppetlabs/puppet/puppet.conf')
-          is_expected.to contain_exec('replace puppet.conf removed by package removal').with_creates('/etc/puppetlabs/puppet/puppet.conf')
-        end
-
-        it do
-          is_expected.to contain_package('puppet-agent').with_ensure('present')
+          is_expected.to contain_package('puppet-agent').with_ensure(package_ensure)
           is_expected.to contain_package('puppet-agent').with_provider('rpm')
           is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm')
         end
@@ -136,6 +142,8 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
               'ensure' => 'directory',
             }) }
           end
+
+          it { is_expected.to contain_class("puppet_agent::osfamily::suse") }
 
           it { is_expected.to contain_file('/etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs').with({
             'ensure' => 'present',
