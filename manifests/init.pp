@@ -37,7 +37,7 @@ class puppet_agent (
 
   if ($package_version == undef and versioncmp("${::clientversion}", '4.0.0') < 0) {
     $_package_version = $puppet_agent::params::master_agent_version
-  } elsif ($package_version != undef and versioncmp("${::clientversion}", $package_version) != 0) {
+  } else {
     $_package_version = $package_version
   }
 
