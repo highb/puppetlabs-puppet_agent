@@ -12,7 +12,7 @@
 #
 class puppet_agent::install(
   $package_file_name = undef,
-  $package_version = 'present'
+  $package_version   = 'present',
 ) {
   assert_private()
 
