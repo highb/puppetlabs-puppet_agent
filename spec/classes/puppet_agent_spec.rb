@@ -44,21 +44,20 @@ describe 'puppet_agent' do
               it { is_expected.to contain_class('puppet_agent::install').that_requires('puppet_agent::prepare') }
               it { is_expected.to contain_package('puppet-agent').with_ensure('present') }
 
-              if Puppet.version < "4.0.0"
+              if Puppet.version < "4.0.0" && !params[:is_pe]
                 it { is_expected.to contain_class('puppet_agent::service').that_requires('puppet_agent::install') }
-                if params[:service_names].nil?
+              end
+              
+              if params[:service_names].nil?
+                if Puppet.version < "4.0.0" && !params[:is_pe]
                   it { is_expected.to contain_service('puppet') }
                   it { is_expected.to contain_service('mcollective') }
-                else
-                  it { is_expected.to_not contain_service('puppet') }
-                  it { is_expected.to_not contain_service('mcollective') }
                 end
-                it { is_expected.to contain_package('puppet-agent').with_ensure('present') }
               else
                 it { is_expected.to_not contain_service('puppet') }
                 it { is_expected.to_not contain_service('mcollective') }
-                it { is_expected.to_not contain_package('puppet-agent') }
               end
+              it { is_expected.to contain_package('puppet-agent').with_ensure('present') }
             end
           end
         end
