@@ -37,14 +37,16 @@ class puppet_agent (
 
   if ($package_version == undef and versioncmp("${::clientversion}", '4.0.0') < 0) {
     $_package_version = $puppet_agent::params::master_agent_version
-  } else {
+  } elsif $package_version != undef {
     $_package_version = $package_version
   }
 
   if versioncmp("${::clientversion}", '3.8.0') < 0 {
     fail('upgrading requires at least Puppet 3.8')
+  } elsif (versioncmp("${::clientversion}", '4.0.0') >= 0 and $_package_version == undef)  {
+    info("puppet_agent performs no actions on Puppet 4+ if a package_version is not specified")
   } else {
-    if $package_version != undef and $package_version !~ /^\d+\.\d+\.\d+[.-]?\d*$/ {
+    if $_package_version != undef and $_package_version !~ /^\d+\.\d+\.\d+[.-]?\d*$/ {
       fail("invalid version ${package_version} requested")
     }
 
@@ -84,11 +86,11 @@ class puppet_agent (
 
     class { '::puppet_agent::prepare':
       package_file_name => $_package_file_name,
-      package_version   => $package_version,
+      package_version   => $_package_version,
     } ->
     class { '::puppet_agent::install':
       package_file_name => $_package_file_name,
-      package_version   => $package_version,
+      package_version   => $_package_version,
     }
 
     contain '::puppet_agent::prepare'
