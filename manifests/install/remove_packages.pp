@@ -7,30 +7,28 @@
 class puppet_agent::install::remove_packages {
   assert_private()
 
-  if versioncmp("${::clientversion}", '4.0.0') < 0 {
-
-    if $::operatingsystem == 'Darwin' {
-
-      contain '::puppet_agent::install::remove_packages_osx'
-
-    } else {
-
-      $package_options = $::operatingsystem ? {
-        'SLES'  => {
-          uninstall_options => '--nodeps',
-          provider          => 'rpm',
-        },
-        'AIX'  => {
-          uninstall_options => '--nodeps',
-          provider          => 'rpm',
-        },
-        'Solaris' => {
-          adminfile => '/opt/puppetlabs/packages/solaris-noask',
-        },
-        default => {
-        }
+  if $::operatingsystem == 'Darwin' {
+    contain '::puppet_agent::install::remove_packages_osx'
+  } else {
+    $package_options = $::operatingsystem ? {
+      'SLES'  => {
+        uninstall_options => '--nodeps',
+        provider          => 'rpm',
+      },
+      'AIX'  => {
+        uninstall_options => '--nodeps',
+        provider          => 'rpm',
+      },
+      'Solaris' => {
+        adminfile => '/opt/puppetlabs/packages/solaris-noask',
+      },
+      default => {
       }
+    }
 
+    if versioncmp("${::clientversion}", '4.0.0') < 0 {
+      # We only need to remove these packages if we are transitioning from PE
+      # versions that are pre AIO.
       $packages = $::operatingsystem ? {
         'Solaris' => [
           'PUPpuppet',
@@ -69,14 +67,22 @@ class puppet_agent::install::remove_packages {
           'pe-ruby-ldap',
         ]
       }
+    } elsif versioncmp("${::aio_agent_version}", "${::package_version}") < 0 {
+      if $::operatingsystem == 'Solaris' {
+        $packages = [
+          'PUPpuppet-agent',
+        ]
+      } else {
+        $packages = []
+      }
+    } else {
+      $packages = []
+    }
 
-      # We only need to remove these packages if we are transitioning from PE
-      # versions that are pre AIO.
-      $packages.each |$old_package| {
-        package { $old_package:
-          ensure => absent,
-          *      => $package_options,
-        }
+    $packages.each |$old_package| {
+      package { $old_package:
+        ensure => absent,
+        *      => $package_options,
       }
     }
   }
