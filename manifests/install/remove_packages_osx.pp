@@ -58,8 +58,8 @@ class puppet_agent::install::remove_packages_osx {
         }
       }
     } elsif versioncmp("${::aio_agent_version}", "${::package_version}") < 0 {
-      exec { "forget puppet-agent":
-        command => "/usr/sbin/pkgutil --forget com.puppetlabs.puppet-agent",
+      exec { 'forget puppet-agent':
+        command => '/usr/sbin/pkgutil --forget com.puppetlabs.puppet-agent',
       }
     }
   }
