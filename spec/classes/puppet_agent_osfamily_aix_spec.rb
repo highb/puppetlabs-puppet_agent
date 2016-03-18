@@ -12,15 +12,12 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
     end
   end
 
-  if Puppet.version >= "4.0.0"
-    package_ensure = '1.2.5'
-    let(:params) do
-      {
-        :package_version => package_ensure
-      }
-    end
-  else
-    package_ensure = 'present'
+  package_version = '1.2.5'
+  package_ensure = 'present'
+  let(:params) do
+    {
+      :package_version => package_version
+    }
   end
 
   facts = {
@@ -41,13 +38,13 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         })
       end
 
-      rpmname = "puppet-agent-1.2.5-1.aix#{aixver}.1.ppc.rpm"
+      rpmname = "puppet-agent-#{package_version}-1.aix#{aixver}.1.ppc.rpm"
 
       if Puppet.version < "4.0.0"
         it { is_expected.to contain_file('/etc/puppetlabs/puppet') }
         it { is_expected.to contain_file('/etc/puppetlabs/puppet/puppet.conf') }
       end
-      
+
       it do
         is_expected.to contain_exec('replace puppet.conf removed by package removal').with_command('cp /etc/puppetlabs/puppet/puppet.conf.rpmsave /etc/puppetlabs/puppet/puppet.conf')
         is_expected.to contain_exec('replace puppet.conf removed by package removal').with_creates('/etc/puppetlabs/puppet/puppet.conf')
@@ -112,7 +109,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         })
       end
 
-      rpmname = "puppet-agent-1.2.5-1.aix#{aixver}.1.ppc.rpm"
+      rpmname = "puppet-agent-#{package_version}-1.aix#{aixver}.1.ppc.rpm"
 
       it {
         is_expected.to_not contain_file("/opt/puppetlabs/packages/#{rpmname}") }

@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe 'puppet_agent' do
+  package_version = '1.2.5'
+  global_params = {
+    :package_version => package_version
+  }
+
   context 'supported operating systems' do
     on_supported_os.each do |os, facts|
       context "on #{os}" do
@@ -34,7 +39,7 @@ describe 'puppet_agent' do
         else
           [{}, {:service_names => []}].each do |params|
             context "puppet_agent class without any parameters" do
-              let(:params) { params }
+              let(:params) { params.merge(global_params) }
 
               it { is_expected.to compile.with_all_deps }
 
@@ -42,12 +47,12 @@ describe 'puppet_agent' do
               it { is_expected.to contain_class('puppet_agent::params') }
               it { is_expected.to contain_class('puppet_agent::prepare') }
               it { is_expected.to contain_class('puppet_agent::install').that_requires('puppet_agent::prepare') }
-              it { is_expected.to contain_package('puppet-agent').with_ensure('present') }
+              it { is_expected.to contain_package('puppet-agent').with_ensure(package_version) }
 
               if Puppet.version < "4.0.0" && !params[:is_pe]
                 it { is_expected.to contain_class('puppet_agent::service').that_requires('puppet_agent::install') }
               end
-              
+
               if params[:service_names].nil?
                 if Puppet.version < "4.0.0" && !params[:is_pe]
                   it { is_expected.to contain_service('puppet') }
@@ -57,7 +62,6 @@ describe 'puppet_agent' do
                 it { is_expected.to_not contain_service('puppet') }
                 it { is_expected.to_not contain_service('mcollective') }
               end
-              it { is_expected.to contain_package('puppet-agent').with_ensure('present') }
             end
           end
         end
@@ -65,7 +69,7 @@ describe 'puppet_agent' do
     end
   end
 
-  context 'unsupported operating system', :unless => Puppet.version < "3.8.0" || Puppet.version >= "4.0.0" do
+  context 'unsupported operating system', :unless => Puppet.version < "3.8.0" do
     describe 'puppet_agent class without any parameters on Solaris/Nexenta' do
       let(:facts) {{
         :osfamily        => 'Solaris',
@@ -74,8 +78,9 @@ describe 'puppet_agent' do
         :puppet_config   => '/dev/null/puppet.conf',
         :architecture    => 'i386',
       }}
+      let(:params) { global_params }
 
-      it { expect { is_expected.to contain_package('puppet_agent') }.to raise_error(Puppet::Error, /Nexenta not supported/) }
+      it { is_expected.to raise_error(Puppet::Error, /Nexenta not supported/) }
     end
   end
 end

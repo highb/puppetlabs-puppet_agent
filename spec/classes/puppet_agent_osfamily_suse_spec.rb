@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
+  package_version = '1.2.5'
   before(:each) do
     # Need to mock the PE functions
     Puppet::Parser::Functions.newfunction(:pe_build_version, :type => :rvalue) do |args|
@@ -21,6 +22,12 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
     :servername                => 'master.example.vm',
     :clientcert                => 'foo.example.vm',
   }
+
+  let(:params) do
+    {
+      :package_version => package_version
+    }
+  end
 
   describe 'unsupported environment' do
     context 'when not PE' do
@@ -46,17 +53,6 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   end
 
   describe 'supported environment' do
-    if Puppet.version >= "4.0.0"
-      package_ensure = '1.2.5'
-      let(:params) do
-        {
-          :package_version => package_ensure
-        }
-      end
-    else
-      package_ensure = 'present'
-    end
-
     context "when operatingsystemmajrelease 10 is supported" do
       let(:facts) do
         facts.merge({
@@ -112,7 +108,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         end
 
         it do
-          is_expected.to contain_package('puppet-agent').with_ensure(package_ensure)
+          is_expected.to contain_package('puppet-agent').with_ensure('present')
           is_expected.to contain_package('puppet-agent').with_provider('rpm')
           is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm')
         end

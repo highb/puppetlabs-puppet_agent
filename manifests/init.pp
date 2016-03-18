@@ -35,7 +35,7 @@ class puppet_agent (
 
   validate_re($arch, ['^x86$','^x64$','^i386$','^i86pc$','^amd64$','^x86_64$','^power$','^sun4[uv]$','PowerPC_POWER'])
 
-  if ($package_version == undef and versioncmp("${::clientversion}", '4.0.0') < 0) {
+  if ($package_version == undef and $puppet_agent::params::master_agent_version != undef and versioncmp("${::clientversion}", '4.0.0') < 0) {
     $_package_version = $puppet_agent::params::master_agent_version
   } elsif $package_version != undef {
     $_package_version = $package_version
@@ -43,8 +43,8 @@ class puppet_agent (
 
   if versioncmp("${::clientversion}", '3.8.0') < 0 {
     fail('upgrading requires at least Puppet 3.8')
-  } elsif (versioncmp("${::clientversion}", '4.0.0') >= 0 and $_package_version == undef)  {
-    info("puppet_agent performs no actions on Puppet 4+ if a package_version is not specified")
+  } elsif $_package_version == undef  {
+    info("puppet_agent performs no actions if a package_version is not specified on Puppet 4, or if the master's agent version cannot be determined on Puppet 3.8")
   } else {
     if $_package_version != undef and $_package_version !~ /^\d+\.\d+\.\d+[.-]?\d*$/ {
       fail("invalid version ${package_version} requested")

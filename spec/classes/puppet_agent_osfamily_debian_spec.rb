@@ -11,6 +11,13 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       :clientcert   => 'foo.example.vm',
   }
 
+  # All FOSS and all Puppet 4+ upgrades require the package_version
+  package_version = '1.2.5'
+  let(:params) {
+    {
+      :package_version => package_version
+    }
+  }
   let(:facts) { facts }
 
   it { is_expected.to contain_class('apt') }
@@ -25,7 +32,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       end
 
       Puppet::Parser::Functions.newfunction(:pe_compiling_server_aio_build, :type => :rvalue) do |args|
-        '1.2.5'
+        package_version
       end
     end
 
