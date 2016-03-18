@@ -53,15 +53,18 @@ class puppet_agent::install(
   }
 
   if $::osfamily == 'windows' {
-    if $::puppet_agent::is_pe == true and empty($::puppet_agent::source) and defined(File["${::puppet_agent::params::local_packages_dir}/${package_file_name}"]) {
-      class { 'puppet_agent::windows::install':
-        package_file_name => $package_file_name,
-        source            => windows_native_path("${::puppet_agent::params::local_packages_dir}/${package_file_name}"),
-      }
-    } else {
-      class { 'puppet_agent::windows::install':
-        package_file_name => $package_file_name,
-        source            => $::puppet_agent::source,
+    # Prevent re-running the batch install
+    if versioncmp("${::agent_version}", "${package_version}") < 0 {
+      if $::puppet_agent::is_pe == true and empty($::puppet_agent::source) and defined(File["${::puppet_agent::params::local_packages_dir}/${package_file_name}"]) {
+        class { 'puppet_agent::windows::install':
+          package_file_name => $package_file_name,
+          source            => windows_native_path("${::puppet_agent::params::local_packages_dir}/${package_file_name}"),
+        }
+      } else {
+        class { 'puppet_agent::windows::install':
+          package_file_name => $package_file_name,
+          source            => $::puppet_agent::source,
+        }
       }
     }
   } elsif ($::osfamily == 'Solaris' and $::operatingsystemmajrelease == '10') or $::osfamily == 'Darwin' or $::osfamily == 'AIX' or ($::operatingsystem == 'SLES' and $::operatingsystemmajrelease == '10') {
@@ -69,6 +72,13 @@ class puppet_agent::install(
     # Package is removed above, then re-added as the new version here.
     package { $::puppet_agent::package_name:
       ensure => 'present',
+      *      => $_package_options,
+    }
+  } elsif ($::osfamily == 'RedHat') and ($package_version != 'present') {
+    # Workaround PUP-5802/PUP-5025
+    $os_major = $::os['release']['major']
+    package { $::puppet_agent::package_name:
+      ensure => "${package_version}-1.el${os_major}",
       *      => $_package_options,
     }
   } else {

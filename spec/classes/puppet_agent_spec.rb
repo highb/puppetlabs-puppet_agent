@@ -47,7 +47,14 @@ describe 'puppet_agent' do
               it { is_expected.to contain_class('puppet_agent::params') }
               it { is_expected.to contain_class('puppet_agent::prepare') }
               it { is_expected.to contain_class('puppet_agent::install').that_requires('puppet_agent::prepare') }
-              it { is_expected.to contain_package('puppet-agent').with_ensure(package_version) }
+
+              if facts[:osfamily] == 'RedHat'
+                # Workaround PUP-5802/PUP-5025
+                yum_package_version = package_version + '-1.el' + facts[:operatingsystemmajrelease]
+                it { is_expected.to contain_package('puppet-agent').with_ensure(yum_package_version) }
+              else
+                it { is_expected.to contain_package('puppet-agent').with_ensure(package_version) }
+              end
 
               if Puppet.version < "4.0.0" && !params[:is_pe]
                 it { is_expected.to contain_class('puppet_agent::service').that_requires('puppet_agent::install') }

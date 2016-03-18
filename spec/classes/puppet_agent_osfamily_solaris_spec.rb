@@ -126,6 +126,14 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
             is_expected.to contain_package(package).with_adminfile('/opt/puppetlabs/packages/solaris-noask')
           end
         end
+      else
+        it do
+          is_expected.to contain_transition("remove puppet-agent").with(
+            :attributes => {
+              'ensure' => 'absent',
+              'adminfile' => '/opt/puppetlabs/packages/solaris-noask',
+            })
+        end
       end
 
       it do
@@ -198,12 +206,20 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
             is_expected.to contain_package(package).with_adminfile('/opt/puppetlabs/packages/solaris-noask')
           end
         end
-
+      else
         it do
-          is_expected.to contain_package('puppet-agent').with_adminfile('/opt/puppetlabs/packages/solaris-noask')
-          is_expected.to contain_package('puppet-agent').with_ensure('present')
-          is_expected.to contain_package('puppet-agent').with_source("/opt/puppetlabs/packages/puppet-agent-#{package_version}-1.sparc.pkg")
+          is_expected.to contain_transition("remove puppet-agent").with(
+            :attributes => {
+              'ensure' => 'absent',
+              'adminfile' => '/opt/puppetlabs/packages/solaris-noask',
+            })
         end
+      end
+
+      it do
+        is_expected.to contain_package('puppet-agent').with_adminfile('/opt/puppetlabs/packages/solaris-noask')
+        is_expected.to contain_package('puppet-agent').with_ensure('present')
+        is_expected.to contain_package('puppet-agent').with_source("/opt/puppetlabs/packages/puppet-agent-#{package_version}-1.sparc.pkg")
       end
     end
   end

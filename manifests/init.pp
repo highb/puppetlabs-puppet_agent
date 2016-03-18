@@ -46,7 +46,7 @@ class puppet_agent (
   } elsif $_package_version == undef  {
     info("puppet_agent performs no actions if a package_version is not specified on Puppet 4, or if the master's agent version cannot be determined on Puppet 3.8")
   } else {
-    if $_package_version != undef and $_package_version !~ /^\d+\.\d+\.\d+[.-]?\d*$/ {
+    if $package_version != undef and $package_version !~ /^\d+\.\d+\.\d+[.-]?\d*$/ {
       fail("invalid version ${package_version} requested")
     }
 

@@ -9,7 +9,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
     }
   }
 
-  [['Fedora', 'fedora/f$releasever'], ['CentOS', 'el/$releasever'], ['Amazon', 'el/6']].each do |os, urlbit|
+  [['Fedora', 'fedora/f$releasever', 7], ['CentOS', 'el/$releasever', 7], ['Amazon', 'el/6', 6]].each do |os, urlbit, osmajor|
     context "with #{os} and #{urlbit}" do
       let(:facts) {{
         :osfamily => 'RedHat',
@@ -17,6 +17,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         :architecture => 'x64',
         :servername   => 'master.example.vm',
         :clientcert   => 'foo.example.vm',
+        :os           => {'release' => {'major' => osmajor}}
       }}
 
       it { is_expected.to contain_exec('import-RPM-GPG-KEY-puppetlabs').with({
@@ -55,7 +56,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
     end
   end
 
-  [['RedHat', 'el-7-x86_64', 'el-7-x86_64'], ['Amazon', '', 'el-6-x64']].each do |os, tag, repodir|
+  [['RedHat', 'el-7-x86_64', 'el-7-x86_64', 7], ['Amazon', '', 'el-6-x64', 6]].each do |os, tag, repodir, osmajor|
     context "when PE on #{os}" do
       before(:each) do
         # Need to mock the PE functions
@@ -77,6 +78,7 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
         :clientcert   => 'foo.example.vm',
         :is_pe        => true,
         :platform_tag => tag,
+        :os           => {'release' => {'major' => osmajor}}
       }}
 
       it { is_expected.to contain_yumrepo('puppetlabs-pepackages').with_ensure('absent') }

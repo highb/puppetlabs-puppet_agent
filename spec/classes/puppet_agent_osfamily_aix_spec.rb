@@ -91,9 +91,15 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
          'pe-ruby-ldap',
         ].each do |package|
           it do
-            is_expected.to contain_package(package).with_ensure('absent')
-            is_expected.to contain_package(package).with_uninstall_options('--nodeps')
-            is_expected.to contain_package(package).with_provider('rpm')
+            if Puppet.version < "4.0.0"
+            else
+              is_expected.to contain_transition("remove #{package}").with(
+                :attributes => {
+                  'ensure' => 'absent',
+                  'uninstall_options' => '--nodeps',
+                  'provider' => 'rpm',
+                })
+            end
           end
         end
       end

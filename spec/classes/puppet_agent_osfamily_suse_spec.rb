@@ -106,12 +106,20 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
             is_expected.to contain_package(package).with_provider('rpm')
           end
         end
-
-        it do
-          is_expected.to contain_package('puppet-agent').with_ensure('present')
-          is_expected.to contain_package('puppet-agent').with_provider('rpm')
-          is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm')
+      else
+        [ 'puppet-agent' ].each do |package|
+          it do
+            is_expected.to contain_transition(package).with_ensure('absent')
+            is_expected.to contain_transition(package).with_uninstall_options('--nodeps')
+            is_expected.to contain_transition(package).with_provider('rpm')
+          end
         end
+      end
+
+      it do
+        is_expected.to contain_package('puppet-agent').with_ensure('present')
+        is_expected.to contain_package('puppet-agent').with_provider('rpm')
+        is_expected.to contain_package('puppet-agent').with_source('/opt/puppetlabs/packages/puppet-agent-1.2.5-1.sles10.x86_64.rpm')
       end
     end
 
