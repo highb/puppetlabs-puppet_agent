@@ -66,7 +66,7 @@ class puppet_agent (
       $_package_file_name = "${puppet_agent::package_name}-${_package_version}-1.osx${$::macosx_productversion_major}.dmg"
     } elsif $::operatingsystem == 'aix' and $::architecture =~ /PowerPC_POWER[5,6,7]/ {
       $aix_ver_number = regsubst($::platform_tag,'aix-(\d+\.\d+)-power','\1')
-      $_package_file_name = "${puppet_agent::package_name}-${puppet_agent::params::master_agent_version}-1.aix${aix_ver_number}.ppc.rpm"
+      $_package_file_name = "${puppet_agent::package_name}-${_package_version}-1.aix${aix_ver_number}.ppc.rpm"
     } elsif $::osfamily == 'windows' {
       $_arch = $::kernelmajversion ?{
         /^5\.\d+/ => 'x86', # x64 is never allowed on windows 2003
