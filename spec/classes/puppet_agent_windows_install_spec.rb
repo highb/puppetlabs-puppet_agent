@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe 'puppet_agent', :unless => Puppet.version =~ /^(3\.7|4.\d+)\.\d+/ do
+RSpec.describe 'puppet_agent' do
   package_version = '1.2.5'
   global_params = {
     :package_version => package_version
@@ -25,6 +25,10 @@ RSpec.describe 'puppet_agent', :unless => Puppet.version =~ /^(3\.7|4.\d+)\.\d+/
       let(:facts) { facts }
       let(:params) { global_params }
 
+      context 'without aio_agent_version (FOSS)' do
+        it { is_expected.to contain_class('puppet_agent::windows::install') }
+      end
+
       context 'is_pe' do
         before(:each) do
           # Need to mock the PE functions
@@ -44,7 +48,26 @@ RSpec.describe 'puppet_agent', :unless => Puppet.version =~ /^(3\.7|4.\d+)\.\d+/
           is_expected.to contain_file('C:\tmp\install_puppet.bat').with_content(
             %r[#{Regexp.escape("msiexec.exe /qn /norestart /i \"#{values[:appdata]}\\Puppetlabs\\packages\\puppet-agent-#{values[:expect_arch]}.msi\"")}])
         }
+
+        context 'with up to date aio_agent_version matching server' do
+          let(:facts) { facts.merge({
+            :is_pe => true,
+            :aio_agent_version => '4.0.0'
+          })}
+
+          it { is_expected.not_to contain_class('puppet_agent::windows::install') }
+        end
+
+        context 'with out of date aio_agent_version' do
+          let(:facts) { facts.merge({
+            :is_pe => true,
+            :aio_agent_version => '1.2.0'
+          })}
+
+          it { is_expected.to contain_class('puppet_agent::windows::install') }
+        end
       end
+
       context 'source =>' do
         describe 'https://alterernate.com/puppet-agent.msi' do
           let(:params) { global_params.merge(
