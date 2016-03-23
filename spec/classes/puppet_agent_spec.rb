@@ -34,6 +34,23 @@ describe 'puppet_agent' do
           end
         end
 
+        context 'invalid package_versions' do
+          ['1.3.5banana', '1.2', '10-q-5'].each do |version|
+            let(:params) { { :package_version => version } }
+
+            it { expect { catalogue }.to raise_error(/invalid version/) }
+          end
+        end
+
+        context 'valid package_versions' do
+          ['1.4.0.30.g886c5ab', '1.4.0', '1.4.0-10', '1.4.0.10'].each do |version|
+            let(:params) { { :package_version => version } }
+
+            it { is_expected.to compile.with_all_deps }
+            it { expect { catalogue }.not_to raise_error }
+          end
+        end
+
         if Puppet.version < "3.8.0"
           it { expect { is_expected.to contain_package('puppet_agent') }.to raise_error(Puppet::Error, /upgrading requires at least Puppet 3.8/) }
         else
