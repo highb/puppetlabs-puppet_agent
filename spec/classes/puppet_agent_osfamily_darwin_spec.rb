@@ -93,7 +93,7 @@ describe 'puppet_agent' do
             it { is_expected.to contain_exec("forget #{package}").with_require('File[/opt/puppet]') }
           end
         else
-          it { is_expected.to contain_exec("forget #{package}").with_command("/usr/sbin/pkgutil --forget com.puppetlabs.#{package}") }
+          it { is_expected.to contain_exec("forget puppet-agent").with_command("/usr/sbin/pkgutil --forget com.puppetlabs.puppet-agent") }
         end
       end
     end
