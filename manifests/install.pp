@@ -76,9 +76,8 @@ class puppet_agent::install(
     }
   } elsif ($::osfamily == 'RedHat') and ($package_version != 'present') {
     # Workaround PUP-5802/PUP-5025
-    $os_major = $::os['release']['major']
     package { $::puppet_agent::package_name:
-      ensure => "${package_version}-1.el${os_major}",
+      ensure => "${package_version}-1.el${::operatingsystemmajrelease}",
       *      => $_package_options,
     }
   } else {

@@ -12,12 +12,12 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
   [['Fedora', 'fedora/f$releasever', 7], ['CentOS', 'el/$releasever', 7], ['Amazon', 'el/6', 6]].each do |os, urlbit, osmajor|
     context "with #{os} and #{urlbit}" do
       let(:facts) {{
-        :osfamily => 'RedHat',
-        :operatingsystem => os,
-        :architecture => 'x64',
-        :servername   => 'master.example.vm',
-        :clientcert   => 'foo.example.vm',
-        :os           => {'release' => {'major' => osmajor}}
+        :osfamily                  => 'RedHat',
+        :operatingsystem           => os,
+        :architecture              => 'x64',
+        :servername                => 'master.example.vm',
+        :clientcert                => 'foo.example.vm',
+        :operatingsystemmajrelease => osmajor,
       }}
 
       it { is_expected.to contain_exec('import-RPM-GPG-KEY-puppetlabs').with({
@@ -71,14 +71,14 @@ describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
       end
 
       let(:facts) {{
-        :osfamily => 'RedHat',
-        :operatingsystem => os,
-        :architecture => 'x64',
-        :servername   => 'master.example.vm',
-        :clientcert   => 'foo.example.vm',
-        :is_pe        => true,
-        :platform_tag => tag,
-        :os           => {'release' => {'major' => osmajor}}
+        :osfamily                  => 'RedHat',
+        :operatingsystem           => os,
+        :architecture              => 'x64',
+        :servername                => 'master.example.vm',
+        :clientcert                => 'foo.example.vm',
+        :is_pe                     => true,
+        :platform_tag              => tag,
+        :operatingsystemmajrelease => osmajor,
       }}
 
       it { is_expected.to contain_yumrepo('puppetlabs-pepackages').with_ensure('absent') }
