@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
+describe 'puppet_agent' do
   before(:each) do
     Puppet::Parser::Functions.newfunction(:pe_build_version, :type => :rvalue) do |args|
       "4.0.0"

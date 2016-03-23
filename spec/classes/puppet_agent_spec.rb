@@ -51,41 +51,37 @@ describe 'puppet_agent' do
           end
         end
 
-        if Puppet.version < "3.8.0"
-          it { expect { is_expected.to contain_package('puppet_agent') }.to raise_error(Puppet::Error, /upgrading requires at least Puppet 3.8/) }
-        else
-          [{}, {:service_names => []}].each do |params|
-            context "puppet_agent class without any parameters" do
-              let(:params) { params.merge(global_params) }
+        [{}, {:service_names => []}].each do |params|
+          context "puppet_agent class without any parameters" do
+            let(:params) { params.merge(global_params) }
 
-              it { is_expected.to compile.with_all_deps }
+            it { is_expected.to compile.with_all_deps }
 
-              it { is_expected.to contain_class('puppet_agent') }
-              it { is_expected.to contain_class('puppet_agent::params') }
-              it { is_expected.to contain_class('puppet_agent::prepare') }
-              it { is_expected.to contain_class('puppet_agent::install').that_requires('puppet_agent::prepare') }
+            it { is_expected.to contain_class('puppet_agent') }
+            it { is_expected.to contain_class('puppet_agent::params') }
+            it { is_expected.to contain_class('puppet_agent::prepare') }
+            it { is_expected.to contain_class('puppet_agent::install').that_requires('puppet_agent::prepare') }
 
-              if facts[:osfamily] == 'RedHat'
-                # Workaround PUP-5802/PUP-5025
-                yum_package_version = package_version + '-1.el' + facts[:operatingsystemmajrelease]
-                it { is_expected.to contain_package('puppet-agent').with_ensure(yum_package_version) }
-              else
-                it { is_expected.to contain_package('puppet-agent').with_ensure(package_version) }
-              end
+            if facts[:osfamily] == 'RedHat'
+              # Workaround PUP-5802/PUP-5025
+              yum_package_version = package_version + '-1.el' + facts[:operatingsystemmajrelease]
+              it { is_expected.to contain_package('puppet-agent').with_ensure(yum_package_version) }
+            else
+              it { is_expected.to contain_package('puppet-agent').with_ensure(package_version) }
+            end
 
+            if Puppet.version < "4.0.0" && !params[:is_pe]
+              it { is_expected.to contain_class('puppet_agent::service').that_requires('puppet_agent::install') }
+            end
+
+            if params[:service_names].nil?
               if Puppet.version < "4.0.0" && !params[:is_pe]
-                it { is_expected.to contain_class('puppet_agent::service').that_requires('puppet_agent::install') }
+                it { is_expected.to contain_service('puppet') }
+                it { is_expected.to contain_service('mcollective') }
               end
-
-              if params[:service_names].nil?
-                if Puppet.version < "4.0.0" && !params[:is_pe]
-                  it { is_expected.to contain_service('puppet') }
-                  it { is_expected.to contain_service('mcollective') }
-                end
-              else
-                it { is_expected.to_not contain_service('puppet') }
-                it { is_expected.to_not contain_service('mcollective') }
-              end
+            else
+              it { is_expected.to_not contain_service('puppet') }
+              it { is_expected.to_not contain_service('mcollective') }
             end
           end
         end
@@ -93,7 +89,7 @@ describe 'puppet_agent' do
     end
   end
 
-  context 'unsupported operating system', :unless => Puppet.version < "3.8.0" do
+  context 'unsupported operating system' do
     describe 'puppet_agent class without any parameters on Solaris/Nexenta' do
       let(:facts) {{
         :osfamily        => 'Solaris',

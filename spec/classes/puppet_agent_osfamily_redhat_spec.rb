@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
+describe 'puppet_agent' do
   # All FOSS and all Puppet 4+ upgrades require the package_version
   package_version = '1.2.5'
   let(:params) {

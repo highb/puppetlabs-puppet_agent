@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'puppet_agent', :unless => Puppet.version < "3.8.0" do
+describe 'puppet_agent' do
   package_version = '1.2.5'
   before(:each) do
     # Need to mock the PE functions
