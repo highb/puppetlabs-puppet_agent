@@ -107,12 +107,11 @@ describe 'puppet_agent' do
           end
         end
       else
-        [ 'puppet-agent' ].each do |package|
-          it do
-            is_expected.to contain_transition(package).with_ensure('absent')
-            is_expected.to contain_transition(package).with_uninstall_options('--nodeps')
-            is_expected.to contain_transition(package).with_provider('rpm')
-          end
+        it do
+          is_expected.to contain_transition('remove puppet-agent').with_attributes(
+            'ensure' => 'absent',
+            'uninstall_options' => '--nodeps',
+            'provider' => 'rpm')
         end
       end
 

@@ -164,7 +164,9 @@ RSpec.describe 'puppet_agent' do
             :puppetversion => '3.8.0',
             :tmpdir => 'C:\tmp',
             :architecture => 'x86',
-            :system32 => 'C:\windows\sysnative'
+            :system32 => 'C:\windows\sysnative',
+            :puppet_confdir => "#{values[:appdata]}\\Puppetlabs\\puppet\\etc",
+            :mco_confdir => "#{values[:appdata]}\\Puppetlabs\\mcollective\\etc",
           } }
           let(:params) { global_params.merge(
             {:arch => 'x64'})
