@@ -101,9 +101,11 @@ class puppet_agent::install(
       ($::operatingsystem == 'SLES' and $::operatingsystemmajrelease == '10') {
     # Solaris 10/OSX/AIX/SLES 10 package provider does not provide 'versionable'
     # Package is removed above, then re-added as the new version here.
-    package { $::puppet_agent::package_name:
-      ensure => 'present',
-      *      => $_package_options,
+    if $::puppet_agent::aio_upgrade_required {
+      package { $::puppet_agent::package_name:
+        ensure => 'present',
+        *      => $_package_options,
+      }
     }
   } elsif ($::osfamily == 'RedHat') and ($package_version != 'present') {
     # Workaround PUP-5802/PUP-5025

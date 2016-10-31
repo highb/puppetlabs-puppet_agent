@@ -14,7 +14,7 @@ class puppet_agent::prepare::package(
 
   # Guard this so that we do not perform expensive checksum logic on the master
   # for the large puppet-agent file if we have already upgraded.
-  if $puppet_agent::params::master_agent_version != $::aio_agent_version {
+  if $puppet_agent::aio_upgrade_required {
     $pe_server_version = pe_build_version()
 
     if $::osfamily == 'windows' {
